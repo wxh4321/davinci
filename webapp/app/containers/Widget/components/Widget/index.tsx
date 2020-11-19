@@ -48,6 +48,7 @@ export type WidgetMode = 'pivot' | 'chart'
 export type Coordinate = 'cartesian' | 'polar' | 'other'
 
 export interface IWidgetDimension {
+  from: any
   name: string
   field: IFieldConfig
   format: IFieldFormatConfig
@@ -102,6 +103,16 @@ export interface IChartStyles {
   doubleYAxis?: IDoubleYAxisConfig
 }
 
+export interface IChartConfig {
+  controls: IControl[]
+  limit: number
+  cache: boolean
+  expired: number
+  autoLoadData: boolean
+  sum: boolean
+  queryMode: ControlQueryMode
+}
+
 export interface IChartRule {
   dimension: number | [number, number]
   metric: number | [number, number]
@@ -134,6 +145,7 @@ export interface IWidgetConfigBase {
   secondaryMetrics?: IWidgetSecondaryMetric[]
   filters: IWidgetFilter[]
   chartStyles: IChartStyles
+  chartConfig: IChartConfig
   selectedChart: number
   color?: IDataParamProperty
   label?: IDataParamProperty
@@ -174,6 +186,7 @@ export interface IWidgetConfig extends IWidgetConfigBase {
   cache: boolean
   expired: number
   autoLoadData: boolean
+  sum: boolean
   queryMode: ControlQueryMode
 }
 
@@ -234,10 +247,9 @@ export class Widget extends React.Component<
 
   public render () {
     const { loading, empty, ...rest } = this.props
+    
     const { width, height } = this.state
-
     const widgetProps = { width, height, ...rest }
-
     let widgetContent: JSX.Element
     if (width && height) {
       // FIXME

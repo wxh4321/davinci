@@ -15,6 +15,7 @@ const styles = require('../Workbench.less')
 interface IDropboxItemProps {
   container: string
   item: IDataParamSourceInBox
+  mode: string
   dimetionsCount: number
   metricsCount: number
   onDragStart: (item: IDataParamSource, e: React.DragEvent<HTMLLIElement | HTMLParagraphElement>) => void
@@ -26,6 +27,7 @@ interface IDropboxItemProps {
   onChangeColorConfig: (item: IDataParamSource) => void
   onChangeFilterConfig: (item: IDataParamSource) => void
   onChangeChart: (item: IDataParamSource) => (chart: IChartInfo) => void
+  onChangeTotal: (item: IDataParamSource) => void
   onRemove: (e) => void
 }
 
@@ -72,9 +74,9 @@ export class DropboxItem extends React.PureComponent<IDropboxItemProps, IDropbox
       onChangeFormatConfig,
       onSort,
       onChangeColorConfig,
-      onChangeFilterConfig } = this.props
+      onChangeFilterConfig,
+      onChangeTotal } = this.props
     const settingKey = getSettingKeyByDropItem(key)
-
     switch (settingKey) {
       case 'aggregator':
         onChangeAgg(item as IDataParamSource, key as AggregatorType)
@@ -91,14 +93,18 @@ export class DropboxItem extends React.PureComponent<IDropboxItemProps, IDropbox
       case 'format':
         onChangeFormatConfig(item as IDataParamSource)
         break
+      case 'total':
+        onChangeTotal(item as IDataParamSource)
+        break
       case 'sort':
         onSort(item as IDataParamSource, key as FieldSortTypes)
         break
+      
     }
   }
 
   public render () {
-    const { container, item, dimetionsCount, metricsCount, onChangeChart, onRemove } = this.props
+    const { container, item, mode, dimetionsCount, metricsCount, onChangeChart, onRemove } = this.props
     const { name: originalName, type, sort, agg, field } = item
     const { dragging } = this.state
 
@@ -151,10 +157,13 @@ export class DropboxItem extends React.PureComponent<IDropboxItemProps, IDropbox
       contentWithDropdownList = content
     } else {
       const availableSettings =  getAvailableSettings(MapSettingTypes[container], MapItemTypes[item.type], MapItemValueTypes[item.visualType])
-      const dropdownList = getSettingsDropdownList(availableSettings)
+      let dropdownList = getSettingsDropdownList(availableSettings)
       let menuClass = ''
       if (type === 'value') {
         menuClass = styles.valueDropDown
+      }
+      if(mode === 'chart'){
+        dropdownList = dropdownList.filter((item)=> item.key !== 'total')
       }
       contentWithDropdownList = (
         <Dropdown

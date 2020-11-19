@@ -72,6 +72,7 @@ export interface IControl {
   label?: boolean
   cache: boolean
   expired: number
+  sum: boolean
   optionType?: ControlOptionTypes
   valueViewId?: number
   valueField?: string

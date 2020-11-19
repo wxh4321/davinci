@@ -96,6 +96,7 @@ interface IWorkbenchStates {
   references: IReference[]
   computed: any[]
   autoLoadData: boolean
+  sum: boolean
   controlQueryMode: ControlQueryMode
   limit: number
   cache: boolean
@@ -133,6 +134,7 @@ export class Workbench extends React.Component<
       originalComputed: [],
       cache: false,
       autoLoadData: true,
+      sum: true,
       controlQueryMode: ControlQueryMode.Immediately,
       limit: null,
       expired: DEFAULT_CACHE_EXPIRED,
@@ -184,6 +186,7 @@ export class Workbench extends React.Component<
 
   public componentWillReceiveProps(nextProps: IWorkbenchProps) {
     const { currentWidget } = nextProps
+   
     if (currentWidget && currentWidget !== this.props.currentWidget) {
       const { id, name, description, viewId, config } = currentWidget
       const {
@@ -192,11 +195,13 @@ export class Workbench extends React.Component<
         limit,
         cache,
         expired,
+        sum,
         computed,
         autoLoadData,
         queryMode,
         ...rest
       } = config
+
       this.setState({
         id,
         name,
@@ -208,6 +213,7 @@ export class Workbench extends React.Component<
         controlQueryMode: queryMode,
         limit,
         expired,
+        sum,
         selectedViewId: viewId,
         originalWidgetProps: { ...rest },
         widgetProps: { ...rest },
@@ -309,6 +315,7 @@ export class Workbench extends React.Component<
       references,
       cache,
       autoLoadData,
+      sum,
       limit,
       expired,
       widgetProps,
@@ -342,6 +349,7 @@ export class Workbench extends React.Component<
               limit,
               cache,
               autoLoadData,
+              sum,
               expired,
               data: []
             }),
@@ -376,6 +384,7 @@ export class Workbench extends React.Component<
               limit,
               cache,
               autoLoadData,
+              sum,
               expired,
               data: []
             }),
@@ -450,6 +459,7 @@ export class Workbench extends React.Component<
     })
   }
 
+ 
   private setWidgetProps = (widgetProps: IWidgetProps) => {
     const { cols, rows } = widgetProps
     const data = [...(widgetProps.data || this.state.widgetProps.data)]
@@ -486,7 +496,8 @@ export class Workbench extends React.Component<
       widgetProps,
       computed,
       originalComputed,
-      autoLoadData
+      autoLoadData,
+      sum
     } = this.state
     if (!name.trim()) {
       message.error('Widget名称不能为空')
@@ -515,6 +526,7 @@ export class Workbench extends React.Component<
         cache,
         expired,
         autoLoadData,
+        sum,
         data: []
       }),
       publish: true
@@ -602,6 +614,12 @@ export class Workbench extends React.Component<
     })
   }
 
+  private changeSum = (e) => {
+    this.setState({
+      sum: e.target.value,
+    })
+  }
+
   private openSettingForm = () => {
     this.setState({
       settingFormVisible: true
@@ -629,7 +647,6 @@ export class Workbench extends React.Component<
       settingFormVisible: false
     })
   }
-
   public render() {
     const {
       views,
@@ -650,6 +667,7 @@ export class Workbench extends React.Component<
       limit,
       cache,
       autoLoadData,
+      sum,
       expired,
       computed,
       splitSize,
@@ -661,7 +679,7 @@ export class Workbench extends React.Component<
     } = this.state
     const { queryMode: workbenchQueryMode, multiDrag } = settings
 
-    const { selectedChart, cols, rows, metrics, data } = widgetProps
+    let { selectedChart, cols, rows, metrics, data } = widgetProps
     const hasDataConfig = !!(cols.length || rows.length || metrics.length)
     const maskProps: IDashboardItemMaskProps = {
       loading: dataLoading,
@@ -708,12 +726,15 @@ export class Workbench extends React.Component<
                 limit={limit}
                 cache={cache}
                 autoLoadData={autoLoadData}
+                sum={sum}
                 expired={expired}
                 workbenchQueryMode={workbenchQueryMode}
                 multiDrag={multiDrag}
                 computed={computed}
+                widgetProps = {widgetProps}
                 onViewSelect={this.viewSelect}
                 onChangeAutoLoadData={this.changeAutoLoadData}
+                onChangeSum={this.changeSum}
                 onSetControls={this.setControls}
                 onSetReferences={this.setReferences}
                 onLimitChange={this.limitChange}
@@ -734,6 +755,7 @@ export class Workbench extends React.Component<
                     loading={<DashboardItemMask.Loading {...maskProps} />}
                     empty={<DashboardItemMask.Empty {...maskProps} />}
                     editing={true}
+                    sum={sum}
                     onPaginationChange={this.paginationChange}
                     onChartStylesChange={this.chartStylesChange}
                   />
