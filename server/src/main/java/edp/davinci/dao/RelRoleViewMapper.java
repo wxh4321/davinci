@@ -24,9 +24,11 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public interface RelRoleViewMapper {
 
     int insert(RelRoleView relRoleView);
@@ -52,7 +54,6 @@ public interface RelRoleViewMapper {
             "delete from rel_role_view where  view_id = #{viewId}"
     })
     int deleteByViewId(Long viewId);
-
 
     @Delete({
             "delete from rel_role_view where  role_id = #{roleId}"
@@ -80,5 +81,5 @@ public interface RelRoleViewMapper {
     @Delete({ 
             "delete from rel_role_view where role_id = #{roleId} and view_id in (select id from view where project_id = #{projectId})" 
     })
-    int deleteByRoleAndProject(Long roleId, Long projectId);
+    int deleteByRoleAndProject(@Param("roleId") Long roleId, @Param("projectId") Long projectId);
 }

@@ -20,6 +20,13 @@ class ExternalLogin extends React.Component<IExternalLoginProps, {}> {
     const { onGetExternalAuthProviders, tryExternalAuth } = this.props
     onGetExternalAuthProviders()
     tryExternalAuth(() => {
+      if (localStorage.getItem('shareToken')) {
+        const token = localStorage.getItem('shareToken')
+        const hash = localStorage.getItem('shareRoute')
+        location.replace(`/share.html?shareToken=${token}${hash}`)
+        return
+      }
+
       location.replace('/#/projects')
     })
   }

@@ -25,9 +25,11 @@ import edp.davinci.model.RelRoleSlide;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public interface RelRoleSlideMapper {
 
     int insert(RelRoleSlide relRoleSlide);
@@ -58,7 +60,7 @@ public interface RelRoleSlideMapper {
             "INNER JOIN display d on d.id = s.display_id",
             "where rrs.role_id = #{id} and rrs.visible = 0 and d.project_id = #{projectId}"
     })
-    List<Long> getExecludeSlides(@Param("id") Long id, @Param("projectId") Long projectId);
+    List<Long> getExcludeSlides(@Param("id") Long id, @Param("projectId") Long projectId);
 
     @Delete({"delete from rel_role_slide where slide_id = #{slideId} and role_id = #{roleId}"})
     int delete(@Param("slideId") Long slideId, @Param("roleId") Long roleId);
@@ -90,5 +92,5 @@ public interface RelRoleSlideMapper {
         "left join display d on d.id = ds.display_id ",
         "where d.project_id = #{projectId})"
     })
-    int deleteByRoleAndProject(Long roleId, Long projectId);
+    int deleteByRoleAndProject(@Param("roleId") Long roleId, @Param("projectId") Long projectId);
 }

@@ -31,6 +31,7 @@ import edp.davinci.core.utils.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,11 +80,11 @@ public abstract class AbstractSheetWriter {
         header = context.getWorkbook().createCellStyle();
         Font font = context.getWorkbook().createFont();
         font.setFontName("黑体");
-        font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        font.setBold(true);
         header.setFont(font);
         header.setDataFormat(format.getFormat("@"));
-        header.setAlignment(CellStyle.ALIGN_CENTER);
-        header.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        header.setAlignment(HorizontalAlignment.CENTER);
+        header.setVerticalAlignment(VerticalAlignment.CENTER);
     }
 
     protected void writeHeader(SheetContext context) throws Exception {
@@ -214,11 +215,10 @@ public abstract class AbstractSheetWriter {
         }
     }
 
-    protected void writeBody(SheetContext context) {
-    }
-
     protected Boolean refreshHeightWidth(SheetContext context) {
-        context.getSheet().setDefaultRowHeight((short) (20 * 20));
+        SXSSFSheet sheet = (SXSSFSheet)context.getSheet();
+        sheet.setDefaultRowHeight((short) (20 * 20));
+        sheet.trackAllColumnsForAutoSizing();
         for (int i = 0; i < context.getQueryColumns().size(); i++) {
             context.getSheet().autoSizeColumn(i, true);
             QueryColumn queryColumn = context.getQueryColumns().get(i);
@@ -239,22 +239,8 @@ public abstract class AbstractSheetWriter {
     private Double formatNumber(Object value, NumericUnitEnum unitEnum) {
         try {
             return Double.parseDouble(String.valueOf(value));
-
-//            if (null == unitEnum) {
-//                return d;
-//            }
-
-            //如果单位为"万"和"亿"，格式按照"k"和"M"，数据上除10计算渲染
-//            switch (unitEnum) {
-//                case TenThousand:
-//                case OneHundredMillion:
-//                    d = d / 10;
-//                    break;
-//                default:
-//                    break;
-//            }
-//            return d;
         } catch (NumberFormatException e) {
+
         }
         return null;
     }

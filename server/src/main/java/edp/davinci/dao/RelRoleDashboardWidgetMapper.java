@@ -22,10 +22,12 @@ import edp.davinci.model.RelRoleDashboardWidget;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
 
+@Component
 public interface RelRoleDashboardWidgetMapper {
 
     int insertBatch(List<RelRoleDashboardWidget> list);
@@ -81,6 +83,6 @@ public interface RelRoleDashboardWidgetMapper {
             "INNER JOIN dashboard_portal dp ON dp.id = d.dashboard_portal_id " +
             "WHERE dp.project_id = #{projectId} " +
             ") "})
-    int deleteByRoleAndProject(Long roleId, Long projectId);
+    int deleteByRoleAndProject(@Param("roleId") Long roleId, @Param("projectId") Long projectId);
 
 }

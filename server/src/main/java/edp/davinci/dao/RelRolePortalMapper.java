@@ -24,9 +24,11 @@ import edp.davinci.model.RelRolePortal;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public interface RelRolePortalMapper {
 
     int insert(RelRolePortal record);
@@ -44,10 +46,10 @@ public interface RelRolePortalMapper {
     List<RoleDisableViz> getDisablePortalByUser(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
     @Delete({"delete from rel_role_portal where portal_id = #{portalId}"})
-    int deleteByProtalId(@Param("portalId") Long portalId);
+    int deleteByPortalId(@Param("portalId") Long portalId);
 
     @Select("select role_id from rel_role_portal where portal_id = #{portalId} and visible = 0")
-    List<Long> getExecludeRoles(@Param("portalId") Long portalId);
+    List<Long> getExcludeRoles(@Param("portalId") Long portalId);
 
     @Select({
             "select rrp.portal_id",
@@ -55,7 +57,7 @@ public interface RelRolePortalMapper {
             "inner join dashboard_portal p on p.id = rrp.portal_id",
             "where rrp.role_id = #{id} and rrp.visible = 0 and p.project_id = #{projectId}"
     })
-    List<Long> getExecludePortals(@Param("id") Long id, @Param("projectId") Long projectId);
+    List<Long> getExcludePortals(@Param("id") Long id, @Param("projectId") Long projectId);
 
     @Delete({"delete from rel_role_portal where portal_id = #{portalId} and role_id = #{roleId}"})
     int delete(@Param("portalId") Long portalId, @Param("roleId") Long roleId);
@@ -67,5 +69,5 @@ public interface RelRolePortalMapper {
     int deleteByProject(Long projectId);
 
     @Delete({"delete from rel_role_portal where role_id = #{roleId} and portal_id in (select id from dashboard_portal where project_id = #{projectId})"})
-    int deleteByRoleAndProject(Long roleId, Long projectId);
+    int deleteByRoleAndProject(@Param("roleId") Long roleId, @Param("projectId") Long projectId);
 }

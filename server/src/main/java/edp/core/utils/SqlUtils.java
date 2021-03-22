@@ -31,6 +31,7 @@ import edp.davinci.core.enums.LogNameEnum;
 import edp.davinci.core.enums.SqlColumnEnum;
 import edp.davinci.core.utils.SourcePasswordEncryptUtils;
 import edp.davinci.core.utils.SqlParseUtils;
+import edp.davinci.model.Source;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
@@ -91,11 +92,20 @@ public class SqlUtils {
 
     private SourceUtils sourceUtils;
 
-    public SqlUtils init(BaseSource source) {
+    private static String sqlTempDelimiter;
+
+    @Value("${sql-template-delimiter:$}")
+    public void setSqlTempDelimiter(String delimiter) {
+        this.sqlTempDelimiter = delimiter;
+    }
+
+    public SqlUtils init(Source source) {
         // Password decryption
         String decrypt = SourcePasswordEncryptUtils.decrypt(source.getPassword());
         return SqlUtilsBuilder
                 .getBuilder()
+                .withName(source.getId() + AT_SYMBOL + source.getName())
+                .withType(source.getType())
                 .withJdbcUrl(source.getJdbcUrl())
                 .withUsername(source.getUsername())
                 .withPassword(decrypt)
@@ -108,11 +118,13 @@ public class SqlUtils {
                 .build();
     }
 
-    public SqlUtils init(String jdbcUrl, String username, String password, String dbVersion, List<Dict> properties, boolean ext) {
+    public SqlUtils init(String name, String type, String jdbcUrl, String username, String password, String dbVersion, List<Dict> properties, boolean ext) {
         // Password decryption
         String decrypt = SourcePasswordEncryptUtils.decrypt(password);
         return SqlUtilsBuilder
                 .getBuilder()
+                .withName(name)
+                .withType(type)
                 .withJdbcUrl(jdbcUrl)
                 .withUsername(username)
                 .withPassword(decrypt)
@@ -126,8 +138,6 @@ public class SqlUtils {
     }
 
     public void execute(String sql) throws ServerException {
-        sql = filterAnnotate(sql);
-        checkSensitiveSql(sql);
         if (isQueryLogEnable) {
             String md5 = MD5Util.getMD5(sql, true, 16);
             sqlLogger.info("{} execute for sql:{}", md5, formatSql(sql));
@@ -157,11 +167,9 @@ public class SqlUtils {
         return paginate;
     }
 
-    public List<Map<String, Object>> query4List(String sql, int limit) throws Exception {
-        sql = filterAnnotate(sql);
-        checkSensitiveSql(sql);
+    public List<Map<String, Object>> query4List(String sql, int limit) {
         JdbcTemplate jdbcTemplate = jdbcTemplate();
-        jdbcTemplate.setMaxRows(limit > resultLimit ? resultLimit : limit);
+        jdbcTemplate.setMaxRows(limit > resultLimit ? resultLimit : limit > 0 ? limit : resultLimit);
 
         long before = System.currentTimeMillis();
 
@@ -175,10 +183,9 @@ public class SqlUtils {
         return list;
     }
 
-    public PaginateWithQueryColumns query4Paginate(String sql, int pageNo, int pageSize, int totalCount, int limit, Set<String> excludeColumns) throws Exception {
+    public PaginateWithQueryColumns query4Paginate(String sql, int pageNo, int pageSize, int totalCount, int limit, Set<String> excludeColumns) {
+
         PaginateWithQueryColumns paginateWithQueryColumns = new PaginateWithQueryColumns();
-        sql = filterAnnotate(sql);
-        checkSensitiveSql(sql);
 
         long before = System.currentTimeMillis();
 
@@ -330,14 +337,14 @@ public class SqlUtils {
     }
 
     public static Set<String> getQueryFromsAndJoins(String sql) {
-        Set<String> columnPrefixs = new HashSet<>();
+        Set<String> columnPrefixes = new HashSet<>();
         try {
             Statement parse = CCJSqlParserUtil.parse(sql);
             Select select = (Select) parse;
             SelectBody selectBody = select.getSelectBody();
             if (selectBody instanceof PlainSelect) {
                 PlainSelect plainSelect = (PlainSelect) selectBody;
-                columnPrefixExtractor(columnPrefixs, plainSelect);
+                columnPrefixExtractor(columnPrefixes, plainSelect);
             }
 
             if (selectBody instanceof SetOperationList) {
@@ -345,60 +352,60 @@ public class SqlUtils {
                 List<SelectBody> selects = setOperationList.getSelects();
                 for (SelectBody optSelectBody : selects) {
                     PlainSelect plainSelect = (PlainSelect) optSelectBody;
-                    columnPrefixExtractor(columnPrefixs, plainSelect);
+                    columnPrefixExtractor(columnPrefixes, plainSelect);
                 }
             }
 
             if (selectBody instanceof WithItem) {
                 WithItem withItem = (WithItem) selectBody;
                 PlainSelect plainSelect = (PlainSelect) withItem.getSelectBody();
-                columnPrefixExtractor(columnPrefixs, plainSelect);
+                columnPrefixExtractor(columnPrefixes, plainSelect);
             }
         } catch (JSQLParserException e) {
             log.debug(e.getMessage(), e);
         }
-        return columnPrefixs;
+        return columnPrefixes;
     }
 
-    private static void columnPrefixExtractor(Set<String> columnPrefixs, PlainSelect plainSelect) {
-        getFromItemName(columnPrefixs, plainSelect.getFromItem());
+    private static void columnPrefixExtractor(Set<String> columnPrefixes, PlainSelect plainSelect) {
+        getFromItemName(columnPrefixes, plainSelect.getFromItem());
         List<Join> joins = plainSelect.getJoins();
         if (!CollectionUtils.isEmpty(joins)) {
-            joins.forEach(join -> getFromItemName(columnPrefixs, join.getRightItem()));
+            joins.forEach(join -> getFromItemName(columnPrefixes, join.getRightItem()));
         }
     }
 
-    private static void getFromItemName(Set<String> columnPrefixs, FromItem fromItem) {
+    private static void getFromItemName(Set<String> columnPrefixes, FromItem fromItem) {
         if (fromItem == null) {
             return;
         }
         Alias alias = fromItem.getAlias();
         if (alias != null) {
             if (alias.isUseAs()) {
-                columnPrefixs.add(alias.getName().trim() + DOT);
+                columnPrefixes.add(alias.getName().trim() + DOT);
             } else {
-                columnPrefixs.add(alias.toString().trim() + DOT);
+                columnPrefixes.add(alias.toString().trim() + DOT);
             }
         } else {
-            fromItem.accept(getFromItemTableName(columnPrefixs));
+            fromItem.accept(getFromItemTableName(columnPrefixes));
         }
     }
 
-    public static String getColumnLabel(Set<String> columnPrefixs, String columnLable) {
-        if (!CollectionUtils.isEmpty(columnPrefixs)) {
-            for (String prefix : columnPrefixs) {
-                if (columnLable.startsWith(prefix)) {
-                    return columnLable.replaceFirst(prefix, EMPTY);
+    public static String getColumnLabel(Set<String> columnPrefixes, String columnLabel) {
+        if (!CollectionUtils.isEmpty(columnPrefixes)) {
+            for (String prefix : columnPrefixes) {
+                if (columnLabel.startsWith(prefix)) {
+                    return columnLabel.replaceFirst(prefix, EMPTY);
                 }
-                if (columnLable.startsWith(prefix.toLowerCase())) {
-                    return columnLable.replaceFirst(prefix.toLowerCase(), EMPTY);
+                if (columnLabel.startsWith(prefix.toLowerCase())) {
+                    return columnLabel.replaceFirst(prefix.toLowerCase(), EMPTY);
                 }
-                if (columnLable.startsWith(prefix.toUpperCase())) {
-                    return columnLable.replaceFirst(prefix.toUpperCase(), EMPTY);
+                if (columnLabel.startsWith(prefix.toUpperCase())) {
+                    return columnLabel.replaceFirst(prefix.toUpperCase(), EMPTY);
                 }
             }
         }
-        return columnLable;
+        return columnLabel;
     }
 
     /**
@@ -657,12 +664,12 @@ public class SqlUtils {
      * @throws ServerException
      */
     public static void checkSensitiveSql(String sql) throws ServerException {
-        Matcher matcher = PATTERN_SENSITIVE_SQL.matcher(sql.toLowerCase());
-        if (matcher.find()) {
-            String group = matcher.group();
-            log.warn("Sensitive SQL operations are not allowed: {}", group.toUpperCase());
-            throw new ServerException("Sensitive SQL operations are not allowed: " + group.toUpperCase());
-        }
+//        Matcher matcher = PATTERN_SENSITIVE_SQL.matcher(sql.toLowerCase());
+//        if (matcher.find()) {
+//            String group = matcher.group();
+//            log.warn("Sensitive SQL operations are not allowed: {}", group.toUpperCase());
+//            throw new ServerException("Sensitive SQL operations are not allowed: " + group.toUpperCase());
+//        }
     }
 
     public JdbcTemplate jdbcTemplate() throws SourceException {
@@ -880,17 +887,19 @@ public class SqlUtils {
         return StringUtils.isEmpty(aliasSuffix) ? EMPTY : aliasSuffix;
     }
 
+    public static String getSqlTempDelimiter(List<Dict> properties) {
 
-    /**
-     * 过滤sql中的注释
-     *
-     * @param sql
-     * @return
-     */
-    public static String filterAnnotate(String sql) {
-        sql = PATTERN_SQL_ANNOTATE.matcher(sql).replaceAll("$1");
-        sql = sql.replaceAll(NEW_LINE_CHAR, SPACE).replaceAll("(;+\\s*)+", SEMICOLON);
-        return sql;
+        if (CollectionUtils.isEmpty(properties)) {
+            return sqlTempDelimiter;
+        }
+
+        Optional<Dict> optional = properties.stream().filter(d -> d.getKey().equalsIgnoreCase("davinci.sql-template" +
+                "-delimiter")).findFirst();
+        if (optional.isPresent()) {
+            return optional.get().getValue();
+        }
+
+        return sqlTempDelimiter;
     }
 
     public static String formatSqlType(String type) throws ServerException {
@@ -953,6 +962,8 @@ public class SqlUtils {
         private JdbcDataSource jdbcDataSource;
         private int resultLimit;
         private boolean isQueryLogEnable;
+        private String name;
+        private String type;
         private String jdbcUrl;
         private String username;
         private String password;
@@ -980,6 +991,16 @@ public class SqlUtils {
 
         SqlUtilsBuilder withIsQueryLogEnable(boolean isQueryLogEnable) {
             this.isQueryLogEnable = isQueryLogEnable;
+            return this;
+        }
+
+        SqlUtilsBuilder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        SqlUtilsBuilder withType(String type) {
+            this.type = type;
             return this;
         }
 
@@ -1020,6 +1041,8 @@ public class SqlUtils {
             JdbcSourceInfo jdbcSourceInfo = JdbcSourceInfo
                     .JdbcSourceInfoBuilder
                     .aJdbcSourceInfo()
+                    .withName(this.name)
+                    .withType(this.type)
                     .withJdbcUrl(this.jdbcUrl)
                     .withUsername(this.username)
                     .withPassword(this.password)

@@ -51,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.stringtemplate.v4.ST;
@@ -99,9 +98,6 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
 
     @Autowired
     private SqlParseUtils sqlParseUtils;
-
-    @Value("${sql_template_delimiter:$}")
-    private String sqlTempDelimiter;
 
     private static final String SQL_VARABLE_KEY = "name";
 
@@ -188,6 +184,8 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
             throw new NotFoundException("Sql is not found");
         }
 
+        String sqlTempDelimiter = SqlUtils.getSqlTempDelimiter(source.getProperties());
+
         SQLContext context = new SQLContext();
         //解析变量
         List<SqlVariable> variables = viewWithSource.getVariables();
@@ -198,7 +196,7 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
 
         packageParams(isMaintainer, viewWithSource.getId(), sqlEntity, variables, executeParam.getParams(), excludeColumns, user);
 
-        String srcSql = sqlParseUtils.replaceParams(sqlEntity.getSql(), sqlEntity.getQuaryParams(), sqlEntity.getAuthParams(), sqlTempDelimiter);
+        String srcSql = sqlParseUtils.replaceParams(sqlEntity.getSql(), sqlEntity.getQueryParams(), sqlEntity.getAuthParams(), sqlTempDelimiter);
         context.setExecuteSql(sqlParseUtils.getSqls(srcSql, Boolean.FALSE));
 
         List<String> querySqlList = sqlParseUtils.getSqls(srcSql, Boolean.TRUE);
@@ -304,7 +302,7 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
             alertNameTaken(entity, name);
         }
 
-        Source source = getSource(view.getSourceId());
+        Source source = getSource(viewUpdate.getSourceId());
 
         //测试连接
         if (!sqlUtils.init(source).testConnection()) {
@@ -377,7 +375,7 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
             throw new UnAuthorizedException("You have not permission to delete this view");
         }
 
-        if (!CollectionUtils.isEmpty(widgetMapper.getWidgetsByWiew(id))) {
+        if (!CollectionUtils.isEmpty(widgetMapper.getWidgetsByView(id))) {
             throw new ServerException("The current view has been referenced, please delete the reference and then operate");
         }
 
@@ -402,6 +400,8 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
     public PaginateWithQueryColumns executeSql(ViewExecuteSql executeSql, User user) throws NotFoundException, UnAuthorizedException, ServerException {
 
         Source source = getSource(executeSql.getSourceId());
+
+        String sqlTempDelimiter = SqlUtils.getSqlTempDelimiter(source.getProperties());
 
         ProjectDetail projectDetail = null;
         try {
@@ -428,16 +428,16 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
                 sqlEntity.setAuthParams(null);
             }
 
-            if (!CollectionUtils.isEmpty(sqlEntity.getQuaryParams())) {
-                sqlEntity.getQuaryParams().forEach((k, v) -> {
+            if (!CollectionUtils.isEmpty(sqlEntity.getQueryParams())) {
+                sqlEntity.getQueryParams().forEach((k, v) -> {
                     if (v instanceof List && ((List) v).size() > 0) {
                         v = ((List) v).stream().collect(Collectors.joining(COMMA)).toString();
                     }
-                    sqlEntity.getQuaryParams().put(k, v);
+                    sqlEntity.getQueryParams().put(k, v);
                 });
             }
 
-            String srcSql = sqlParseUtils.replaceParams(sqlEntity.getSql(), sqlEntity.getQuaryParams(),
+            String srcSql = sqlParseUtils.replaceParams(sqlEntity.getSql(), sqlEntity.getQueryParams(),
                     sqlEntity.getAuthParams(), sqlTempDelimiter);
 
             SqlUtils sqlUtils = this.sqlUtils.init(source);
@@ -578,7 +578,7 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
         }
 
         if (null == viewWithSource.getSource()) {
-            throw new NotFoundException("source is not found");
+            throw new NotFoundException("Source is not found");
         }
 
         String cacheKey = null;
@@ -588,14 +588,16 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
                 return null;
             }
 
+            Source source = viewWithSource.getSource();
+
+            String sqlTempDelimiter = SqlUtils.getSqlTempDelimiter(source.getProperties());
+
             List<SqlVariable> variables = viewWithSource.getVariables();
             SqlEntity sqlEntity = sqlParseUtils.parseSql(viewWithSource.getSql(), variables, sqlTempDelimiter, user, isMaintainer);
             Set<String> excludeColumns = new HashSet<>();
             packageParams(isMaintainer, viewWithSource.getId(), sqlEntity, variables, executeParam.getParams(), excludeColumns, user);
 
-            String srcSql = sqlParseUtils.replaceParams(sqlEntity.getSql(), sqlEntity.getQuaryParams(), sqlEntity.getAuthParams(), sqlTempDelimiter);
-
-            Source source = viewWithSource.getSource();
+            String srcSql = sqlParseUtils.replaceParams(sqlEntity.getSql(), sqlEntity.getQueryParams(), sqlEntity.getAuthParams(), sqlTempDelimiter);
 
             SqlUtils sqlUtils = this.sqlUtils.init(source);
 
@@ -675,13 +677,15 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
                 return null;
             }
 
+            Source source = viewWithSource.getSource();
+
+            String sqlTempDelimiter = SqlUtils.getSqlTempDelimiter(source.getProperties());
+
             List<SqlVariable> variables = viewWithSource.getVariables();
             SqlEntity sqlEntity = sqlParseUtils.parseSql(viewWithSource.getSql(), variables, sqlTempDelimiter, user, isMaintainer);
             packageParams(isMaintainer, viewWithSource.getId(), sqlEntity, variables, param.getParams(), null, user);
 
-            String srcSql = sqlParseUtils.replaceParams(sqlEntity.getSql(), sqlEntity.getQuaryParams(), sqlEntity.getAuthParams(), sqlTempDelimiter);
-
-            Source source = viewWithSource.getSource();
+            String srcSql = sqlParseUtils.replaceParams(sqlEntity.getSql(), sqlEntity.getQueryParams(), sqlEntity.getAuthParams(), sqlTempDelimiter);
 
             SqlUtils sqlUtils = this.sqlUtils.init(source);
 
@@ -756,7 +760,7 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
         }
 
         //查询参数
-        if (!CollectionUtils.isEmpty(queryVariables) && !CollectionUtils.isEmpty(sqlEntity.getQuaryParams())) {
+        if (!CollectionUtils.isEmpty(queryVariables) && !CollectionUtils.isEmpty(sqlEntity.getQueryParams())) {
             if (!CollectionUtils.isEmpty(paramList)) {
                 Map<String, List<SqlVariable>> map = queryVariables.stream().collect(Collectors.groupingBy(SqlVariable::getName));
                 paramList.forEach(p -> {
@@ -764,20 +768,20 @@ ViewServiceImpl extends BaseEntityService implements ViewService {
                         List<SqlVariable> list = map.get(p.getName());
                         if (!CollectionUtils.isEmpty(list)) {
                             SqlVariable v = list.get(list.size() - 1);
-                            if (null == sqlEntity.getQuaryParams()) {
-                                sqlEntity.setQuaryParams(new HashMap<>());
+                            if (null == sqlEntity.getQueryParams()) {
+                                sqlEntity.setQueryParams(new HashMap<>());
                             }
-                            sqlEntity.getQuaryParams().put(p.getName().trim(), SqlVariableValueTypeEnum.getValue(v.getValueType(), p.getValue(), v.isUdf()));
+                            sqlEntity.getQueryParams().put(p.getName().trim(), SqlVariableValueTypeEnum.getValue(v.getValueType(), p.getValue(), v.isUdf()));
                         }
                     }
                 });
             }
 
-            sqlEntity.getQuaryParams().forEach((k, v) -> {
+            sqlEntity.getQueryParams().forEach((k, v) -> {
                 if (v instanceof List && ((List) v).size() > 0) {
                     v = ((List) v).stream().collect(Collectors.joining(COMMA)).toString();
                 }
-                sqlEntity.getQuaryParams().put(k, v);
+                sqlEntity.getQueryParams().put(k, v);
             });
         }
 
