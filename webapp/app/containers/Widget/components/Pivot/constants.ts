@@ -17,3 +17,8 @@ export enum SumSuffixType {
   Sum = 'sum',
   SubSum = 'subSum'
 }
+
+export enum SumText {
+  Sum = '总和',
+  Sub = '总计',
+}

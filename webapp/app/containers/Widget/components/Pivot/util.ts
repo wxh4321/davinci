@@ -3,7 +3,7 @@ export function getOriginKey(key) {
 }
 
 export function isSumLastNode(key) {
-  return /\_(?<=)\d*sumLast/g.test(key)
+  return /\_(?<=)\d*sumLastNode/g.test(key)
 }
 
 export function isSumNodeEnd(key) {

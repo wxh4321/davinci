@@ -335,8 +335,7 @@ export class OperatingPanel extends React.Component<
         tip,
         chartStyles,
         mode,
-        selectedChart,
-        totalMetrics
+        selectedChart
       } = originalWidgetProps
       const { dataParams } = this.state
       const model = selectedView.model
@@ -417,21 +416,7 @@ export class OperatingPanel extends React.Component<
           }
         })
       }
-
-      if(totalMetrics){
-        totalMetrics.forEach((k)=>{
-          const modelColumn = model[decodeMetricName(k.name)]
-          if (modelColumn) {
-            dataParams.metrics.items = dataParams.metrics.items.concat({
-              ...k,
-              from: 'metrics',
-              type: 'value' as DragType,
-              visualType: modelColumn.visualType,
-              chart: currentWidgetlibs.find((wl) => wl.id === k.chart.id) // FIXME 兼容 0.3.0-beta.1 之前版本，widgetlib requireDimetions requireMetrics 有发生变更
-            })
-          }
-        })
-      }
+    
       filters.forEach((f) => {
         const modelColumn = model[f.name]
         if (modelColumn) {
@@ -1959,6 +1944,7 @@ export class OperatingPanel extends React.Component<
       expired,
       workbenchQueryMode,
       multiDrag,
+      widgetProps,
       computed,
       onCacheChange,
       onChangeAutoLoadData,
@@ -2409,9 +2395,9 @@ export class OperatingPanel extends React.Component<
                   <Col span={24}>
                     <RadioGroup
                       size="small"
-                      value={sum}
+                      value={!!sum}
                       onChange={onChangeSum}
-                      disabled = { this.props.widgetProps.mode === "chart"  }
+                      disabled = { widgetProps.mode === "chart"  }
                     >
                       <RadioButton value={false}>关闭</RadioButton>
                       <RadioButton value={true}>开启</RadioButton>

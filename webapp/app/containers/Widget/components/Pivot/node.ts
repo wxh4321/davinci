@@ -1,3 +1,4 @@
+import { CategoryType } from './constants'
 class Node {
   label: string
   key: string
@@ -10,15 +11,7 @@ class Node {
   levelCount: number
   sumLastNode: Boolean
   sumNode: Boolean
-  constructor(obj, metrics) {
-    if(obj.levelType == 'metrics'){
-      this[obj.originKey] = obj[obj.originKey]
-    } else {
-      metrics.forEach(element => {
-        this[element] = obj[element]
-      });
-    }
-    
+  constructor(obj) {
     this.levelCount = obj.levelCount;
     this.label = obj.label;
     this.key = obj.key;
@@ -30,6 +23,16 @@ class Node {
     this.sumType = obj.sumType
     this.sumNode = obj.sumNode
     this.sumLastNode = obj.sumLastNode
+  }
+  set(obj, metrics){
+    if(obj.levelType !== CategoryType.Metrics){
+      metrics.forEach(element => {
+        this[element] = obj[element]
+      });
+    } else {
+      this[obj.originKey] = obj[obj.originKey]
+    }
+   
   }
 }
 export default Node

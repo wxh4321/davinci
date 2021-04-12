@@ -62,9 +62,8 @@ class TotalConfigModal extends React.PureComponent<
 
   private onTotalTypeChange = (e) => {
     const { localConfig } = this.state
-    const selectedTotalType = e as TotalTypes
+    const selectedTotalType = e
     const previousValues = this.props.form.getFieldsValue() as IFieldTotalConfig
-
     const nextLocalConfig: IFieldTotalConfig = {
       ...localConfig,
       ...previousValues,
@@ -78,7 +77,6 @@ class TotalConfigModal extends React.PureComponent<
   private renderFormatTypes() {
     const { form, visualType } = this.props
     const { getFieldDecorator } = form
-    
     const formatTypesGroup = TotalTypesSetting[visualType] && (
       <FormItem>
         {getFieldDecorator('totalType', {

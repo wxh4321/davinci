@@ -6,7 +6,7 @@ import { getFieldAlias } from '../../Config/Field'
 import { FieldSortTypes } from '../../Config/Sort'
 import { getAggregatorLocale, decodeMetricName } from '../../util'
 import { IChartInfo } from '../../Widget'
-import { getAvailableSettings, getSettingsDropdownList, getSettingKeyByDropItem, MapSettingTypes, MapItemTypes, MapItemValueTypes } from './settings'
+import { getAvailableSettings, getSettingsDropdownList, getSettingKeyByDropItem, MapSettingTypes, MapItemTypes, MapItemValueTypes, MapViewChartTypes } from './settings'
 
 import { Icon, Menu, Dropdown, Tooltip } from 'antd'
 const { Item: MenuItem, SubMenu, Divider: MenuDivider } = Menu
@@ -107,7 +107,6 @@ export class DropboxItem extends React.PureComponent<IDropboxItemProps, IDropbox
     const { container, item, mode, dimetionsCount, metricsCount, onChangeChart, onRemove } = this.props
     const { name: originalName, type, sort, agg, field } = item
     const { dragging } = this.state
-
     const name = type === 'value' ? decodeMetricName(originalName) : originalName
 
     let pivotChartSelector
@@ -156,14 +155,11 @@ export class DropboxItem extends React.PureComponent<IDropboxItemProps, IDropbox
     if (type === 'add') {
       contentWithDropdownList = content
     } else {
-      const availableSettings =  getAvailableSettings(MapSettingTypes[container], MapItemTypes[item.type], MapItemValueTypes[item.visualType])
+      const availableSettings =  getAvailableSettings(MapSettingTypes[container], MapItemTypes[item.type], MapItemValueTypes[item.visualType], MapViewChartTypes[mode])
       let dropdownList = getSettingsDropdownList(availableSettings)
       let menuClass = ''
       if (type === 'value') {
         menuClass = styles.valueDropDown
-      }
-      if(mode === 'chart'){
-        dropdownList = dropdownList.filter((item)=> item.key !== 'total')
       }
       contentWithDropdownList = (
         <Dropdown

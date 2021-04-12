@@ -1,7 +1,7 @@
 import { TotalTypes } from './constants'
 
 export interface IFieldTotalConfig {
-  totalType: TotalTypes
+  totalType: string[]
   [TotalTypes.RowTotal]?: string[]
   [TotalTypes.ColTotal]?: string[]
   [TotalTypes.RowSubTotal]?: string[]

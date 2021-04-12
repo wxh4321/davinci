@@ -2,7 +2,6 @@
 import { ViewModelVisualTypes } from 'containers/View/constants'
 
 export enum TotalTypes {
-  Default = 'default',
   RowTotal = 'rowTotal',
   ColTotal = 'colTotal',
   RowSubTotal = 'rowSubTotal',
