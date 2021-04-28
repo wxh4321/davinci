@@ -141,7 +141,6 @@ interface IOperatingPanelProps {
   limit: number
   cache: boolean
   autoLoadData: boolean
-  sum: boolean
   expired: number
   workbenchQueryMode: WorkbenchQueryMode
   widgetProps: IWidgetProps
@@ -1306,7 +1305,6 @@ export class OperatingPanel extends React.Component<
       nativeQuery: noAggregators,
       limit: options?.limit || this.props.limit,
       cache: false,
-      sum: false,
       expired: 0,
       flush: false
     }
@@ -1940,7 +1938,6 @@ export class OperatingPanel extends React.Component<
       limit,
       cache,
       autoLoadData,
-      sum,
       expired,
       workbenchQueryMode,
       multiDrag,
@@ -2378,29 +2375,6 @@ export class OperatingPanel extends React.Component<
                     >
                       <RadioButton value={true}>是</RadioButton>
                       <RadioButton value={false}>否</RadioButton>
-                    </RadioGroup>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-            <div className={styles.paneBlock}>
-              <h4>开启总和</h4>
-              <div className={styles.blockBody}>
-                <Row
-                  gutter={8}
-                  type="flex"
-                  align="middle"
-                  className={styles.blockRow}
-                >
-                  <Col span={24}>
-                    <RadioGroup
-                      size="small"
-                      value={!!sum}
-                      onChange={onChangeSum}
-                      disabled = { widgetProps.mode === "chart"  }
-                    >
-                      <RadioButton value={false}>关闭</RadioButton>
-                      <RadioButton value={true}>开启</RadioButton>
                     </RadioGroup>
                   </Col>
                 </Row>

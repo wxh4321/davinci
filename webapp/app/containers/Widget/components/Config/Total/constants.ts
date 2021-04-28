@@ -1,4 +1,3 @@
-// import { IFieldTotalConfig } from './types'
 import { ViewModelVisualTypes } from 'containers/View/constants'
 
 export enum TotalTypes {

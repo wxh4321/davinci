@@ -4,7 +4,7 @@ import { ILegend } from './Pivot'
 import { IDataParamProperty } from '../Workbench/OperatingPanel'
 import { DEFAULT_SPLITER } from 'app/globalConstants'
 import { decodeMetricName } from 'containers/Widget/components/util'
-
+import { SumText } from './constants'
 const styles = require('./Pivot.less')
 
 interface ICellProps {
@@ -43,6 +43,8 @@ export class Cell extends React.PureComponent <ICellProps, ICellState> {
       this.setState({isSelected: false})
     }
   }
+
+
   private selectTd  = (event) => {
     const pagex = event.pageX
     const pagey = event.pageY
@@ -67,7 +69,7 @@ export class Cell extends React.PureComponent <ICellProps, ICellState> {
     })
   }
   public render () {
-    const { colKey = '', rowKey = '', width, height, data, chartStyles, color, legend } = this.props
+    let { colKey = '', rowKey = '', width, height, data, chartStyles, color, legend } = this.props
     const { isSelected } = this.state
     const {
       color: fontColor,
@@ -78,6 +80,8 @@ export class Cell extends React.PureComponent <ICellProps, ICellState> {
     } = chartStyles.pivot
     let metrics = this.props.metrics
     if (colKey.includes(DEFAULT_SPLITER) && rowKey.includes(DEFAULT_SPLITER)) {
+      colKey = colKey.replace(/\[总和\]/g,'')
+      rowKey = rowKey.replace(/\[总和\]/g,'')
       const metricColKey = getMetricKey(colKey)
       const metricRowKey = getMetricKey(rowKey)
       if (metricColKey === metricRowKey) {

@@ -96,7 +96,6 @@ interface IWorkbenchStates {
   references: IReference[]
   computed: any[]
   autoLoadData: boolean
-  sum: boolean
   controlQueryMode: ControlQueryMode
   limit: number
   cache: boolean
@@ -134,7 +133,6 @@ export class Workbench extends React.Component<
       originalComputed: [],
       cache: false,
       autoLoadData: true,
-      sum: true,
       controlQueryMode: ControlQueryMode.Immediately,
       limit: null,
       expired: DEFAULT_CACHE_EXPIRED,
@@ -195,7 +193,6 @@ export class Workbench extends React.Component<
         limit,
         cache,
         expired,
-        sum,
         computed,
         autoLoadData,
         queryMode,
@@ -213,7 +210,6 @@ export class Workbench extends React.Component<
         controlQueryMode: queryMode,
         limit,
         expired,
-        sum,
         selectedViewId: viewId,
         originalWidgetProps: { ...rest },
         widgetProps: { ...rest },
@@ -315,7 +311,6 @@ export class Workbench extends React.Component<
       references,
       cache,
       autoLoadData,
-      sum,
       limit,
       expired,
       widgetProps,
@@ -349,7 +344,6 @@ export class Workbench extends React.Component<
               limit,
               cache,
               autoLoadData,
-              sum,
               expired,
               data: []
             }),
@@ -384,7 +378,6 @@ export class Workbench extends React.Component<
               limit,
               cache,
               autoLoadData,
-              sum,
               expired,
               data: []
             }),
@@ -497,7 +490,6 @@ export class Workbench extends React.Component<
       computed,
       originalComputed,
       autoLoadData,
-      sum
     } = this.state
     if (!name.trim()) {
       message.error('Widget名称不能为空')
@@ -526,7 +518,6 @@ export class Workbench extends React.Component<
         cache,
         expired,
         autoLoadData,
-        sum,
         data: []
       }),
       publish: true
@@ -614,12 +605,6 @@ export class Workbench extends React.Component<
     })
   }
 
-  private changeSum = (e) => {
-    this.setState({
-      sum: e.target.value,
-    })
-  }
-
   private openSettingForm = () => {
     this.setState({
       settingFormVisible: true
@@ -667,7 +652,6 @@ export class Workbench extends React.Component<
       limit,
       cache,
       autoLoadData,
-      sum,
       expired,
       computed,
       splitSize,
@@ -726,7 +710,6 @@ export class Workbench extends React.Component<
                 limit={limit}
                 cache={cache}
                 autoLoadData={autoLoadData}
-                sum={sum}
                 expired={expired}
                 workbenchQueryMode={workbenchQueryMode}
                 multiDrag={multiDrag}
@@ -734,7 +717,6 @@ export class Workbench extends React.Component<
                 widgetProps = {widgetProps}
                 onViewSelect={this.viewSelect}
                 onChangeAutoLoadData={this.changeAutoLoadData}
-                onChangeSum={this.changeSum}
                 onSetControls={this.setControls}
                 onSetReferences={this.setReferences}
                 onLimitChange={this.limitChange}
@@ -755,7 +737,6 @@ export class Workbench extends React.Component<
                     loading={<DashboardItemMask.Loading {...maskProps} />}
                     empty={<DashboardItemMask.Empty {...maskProps} />}
                     editing={true}
-                    sum={sum}
                     onPaginationChange={this.paginationChange}
                     onChartStylesChange={this.chartStylesChange}
                   />

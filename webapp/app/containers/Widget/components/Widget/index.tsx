@@ -109,7 +109,6 @@ export interface IChartConfig {
   cache: boolean
   expired: number
   autoLoadData: boolean
-  sum: boolean
   queryMode: ControlQueryMode
 }
 
@@ -186,7 +185,6 @@ export interface IWidgetConfig extends IWidgetConfigBase {
   cache: boolean
   expired: number
   autoLoadData: boolean
-  sum: boolean
   queryMode: ControlQueryMode
 }
 
@@ -247,7 +245,6 @@ export class Widget extends React.Component<
 
   public render () {
     const { loading, empty, ...rest } = this.props
-    
     const { width, height } = this.state
     const widgetProps = { width, height, ...rest }
     let widgetContent: JSX.Element
