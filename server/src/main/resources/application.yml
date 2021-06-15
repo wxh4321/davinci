@@ -17,6 +17,13 @@
 davinci:
   version: 0.3-rc
 
+server:
+  protocol: http
+  address: 127.0.0.1
+  port: 8080
+
+  servlet:
+    context-path: /
 
 file:
   userfiles-path: ${DAVINCI3_HOME}/userfiles/
@@ -24,12 +31,90 @@ file:
   base-path: ${DAVINCI3_HOME}/lib/
 
 
+source:
+  initial-size: 1
+  min-idle: 1
+  max-wait: 30000
+  max-active: 10
+  break-after-acquire-failure: true
+  connection-error-retry-attempts: 1
+  time-between-eviction-runs-millis: 2000
+  min-evictable-idle-time-millis: 600000
+  max-evictable-idle-time-millis: 900000
+  test-while-idle: true
+  test-on-borrow: false
+  test-on-return: false
+  validation-query: select 1
+  validation-query-timeout: 10
+  keep-alive: false
+  filters: stat
+
+  enable-query-log: false
+  result-limit: 1000000
+
 spring:
   servlet:
     multipart:
       max-request-size: 1024MB
       max-file-size: 1024MB
       enabled: true
+
+
+  rest:
+    proxy-host:
+    proxy-port:
+    proxy-ignore:
+
+
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/davinci?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+    initial-size: 1
+    min-idle: 1
+    max-wait: 30000
+    max-active: 10
+    break-after-acquire-failure: true
+    connection-error-retry-attempts: 1
+    time-between-eviction-runs-millis: 2000
+    min-evictable-idle-time-millis: 600000
+    max-evictable-idle-time-millis: 900000
+    test-while-idle: true
+    test-on-borrow: false
+    test-on-return: false
+    validation-query: select 1
+    validation-query-timeout: 10
+    keep-alive: false
+    filters: stat
+
+  mail:
+    host: smtp.163.com
+    port: 25
+    username: wxh17612200673@163.com
+    fromAddress: wxh17612200673@163.com
+    password: GXQYJAYUKEOWGLCR
+    nickname: Davinci
+    default-encoding: utf-8
+    properties:
+      smtp:
+        starttls:
+          enable: true
+          required: true
+        auth: true
+
+        mail:
+          smtp:
+            ssl:
+              enable: false
+  ldap:
+    urls:
+    username:
+    password:
+    base:
+    domainName:
 
   config:
     location: classpath:/

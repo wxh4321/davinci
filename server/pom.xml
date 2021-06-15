@@ -71,6 +71,7 @@
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
             <version>2.2.5.RELEASE</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
@@ -266,7 +267,7 @@
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>x-pack-transport</artifactId>
-            <version>${elasticsearch.version}</version>
+            <version>6.8.11</version>
             <scope>provided</scope>
         </dependency>
 
@@ -515,7 +516,11 @@
 				</executions>
 			</plugin>
 			<!-- 打包jar文件时，配置manifest文件，加入lib包的jar依赖 -->
-			<plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+			<!--<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
@@ -523,7 +528,7 @@
 					<archive>
 						<manifest>
 							<mainClass>edp.DavinciServerApplication</mainClass>
-							<!-- 打包时 MANIFEST.MF文件不记录的时间戳版本 -->
+							&lt;!&ndash; 打包时 MANIFEST.MF文件不记录的时间戳版本 &ndash;&gt;
 							<useUniqueVersions>false</useUniqueVersions>
 							<addClasspath>false</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
@@ -533,7 +538,7 @@
 						</manifestEntries>
 					</archive>
 				</configuration>
-			</plugin>
+			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>

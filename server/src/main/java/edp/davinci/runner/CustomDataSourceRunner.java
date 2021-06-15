@@ -48,8 +48,8 @@ public class CustomDataSourceRunner implements ApplicationRunner {
         } catch (Exception e) {
             log.error("{}", e.getMessage());
             SpringApplication.exit(applicationContext);
-            log.info("Server shutdown");
+            /*log.info("Server shutdown");*/
         }
-        log.info("Load custom datasource finish");
+        /*log.info("Load custom datasource finish");*/
     }
 }
