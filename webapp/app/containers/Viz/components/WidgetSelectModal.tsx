@@ -84,7 +84,7 @@ const WidgetSelectModal: React.FC<IWidgetSelectModalProps> = (props) => {
 
   return (
     <Modal
-      title="选择 Widget"
+      title="选择可视组件"
       wrapClassName="ant-modal-large"
       visible={visible}
       confirmLoading={loading}

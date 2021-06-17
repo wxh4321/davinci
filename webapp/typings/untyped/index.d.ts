@@ -4,8 +4,8 @@ declare module "*.json" {
 }
 
 declare module "*.less" {
-  const value: any;
   export default value;
+  const value: any;
 }
 
 declare module "*.png" {

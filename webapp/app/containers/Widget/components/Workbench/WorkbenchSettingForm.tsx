@@ -89,7 +89,7 @@ export class WorkbenchSettingForm extends PureComponent<IWorkbenchSettingFormPro
 
     return (
       <Modal
-        title="Widget 编辑器设置"
+        title="可视组件编辑器设置"
         wrapClassName="ant-modal-small"
         visible={visible}
         footer={modalButtons}

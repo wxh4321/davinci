@@ -188,7 +188,7 @@ export class WidgetSelector extends React.Component<IWidgetSelectorProps, IWidge
           </Col>
           <Col span={7}>
             <Search
-              placeholder="Widget 名称"
+              placeholder="可视组件名称"
               onSearch={this.onSearchWidgetItem}
             />
           </Col>

@@ -1133,7 +1133,7 @@ export class Grid extends React.Component<IGridProps & RouteComponentWithParams,
         {gridEditable && (
           <>
             <Modal
-              title={`${dashboardItemFormType === 'add' ? '新增' : '修改'} Widget`}
+              title={`${dashboardItemFormType === 'add' ? '新增' : '修改'} 可视组件`}
               wrapClassName="ant-modal-large"
               visible={dashboardItemFormVisible}
               footer={modalButtons}

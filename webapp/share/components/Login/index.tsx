@@ -89,7 +89,7 @@ class Login extends React.PureComponent<ILoginProps, ILoginStates> {
     const { loading } = this.props
     const { username, password } = this.state
     return (
-      // <Background>
+      <Background>
         <LoginForm
           username={username}
           password={password}
@@ -98,7 +98,7 @@ class Login extends React.PureComponent<ILoginProps, ILoginStates> {
           onChangePassword={this.changePassword}
           onLogin={this.doLogin}
         />
-      // </Background>
+      </Background>
     )
   }
 }

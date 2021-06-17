@@ -52,7 +52,7 @@ const Password: FC<ILoginPawwordProps> = ({ loading, onCheck }) => {
   }, [password])
 
   return (
-    // <Background>
+    <Background>
       <form className={styles.forms} onSubmit={onSubmit}>
         <div className={styles.inputs}>
           <Icon type="unlock" />
@@ -68,7 +68,7 @@ const Password: FC<ILoginPawwordProps> = ({ loading, onCheck }) => {
           {loading ? <Icon type="loading" /> : ''}确 定
         </button>
       </form>
-    // </Background>
+    </Background>
   )
 }
 
