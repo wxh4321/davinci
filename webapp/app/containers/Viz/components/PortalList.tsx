@@ -173,7 +173,7 @@ export class PortalList extends React.Component<IPortalListProps, IPortalListSta
         <div className={styles.unit} onClick={this.showPortalForm('add')}>
             <div className={styles.central}>
               <div className={`${styles.item} ${styles.add}`}><Icon type="plus-circle-o" /></div>
-              <div className={`${styles.item} ${styles.text}`}>创建新 Dashboard</div>
+              <div className={`${styles.item} ${styles.text}`}>创建新仪表板</div>
             </div>
         </div>
       </Col>

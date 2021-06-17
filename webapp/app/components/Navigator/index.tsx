@@ -83,11 +83,11 @@ export function Navigator (props: INavigatorProps) {
   return (
     <nav className={headerClass}>
       <div className={styles.logoPc}>
-        <div className={styles.logo}>
+        {/* <div className={styles.logo}>
           <Link to="/projects">
             <img src={require('assets/images/logo.svg')} />
           </Link>
-        </div>
+        </div> */}
       </div>
       <div className={styles.logoMobile}>
         <div className={styles.logo}>
@@ -104,7 +104,7 @@ export function Navigator (props: INavigatorProps) {
             onDownloadFile={onDownloadFile}
           />
         </li>
-        <li>
+        {/* <li>
           <Icon type="file-text" onClick={goDoc} />
         </li>
         <li>
@@ -114,7 +114,7 @@ export function Navigator (props: INavigatorProps) {
           <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
             <Icon type="user" />
           </Dropdown>
-        </li>
+        </li> */}
       </ul>
     </nav>
   )

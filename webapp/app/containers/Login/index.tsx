@@ -63,6 +63,7 @@ export class Login extends React.PureComponent<
 
   public componentWillMount() {
     this.checkNormalLogin()
+    // this.doLogin(null);
   }
 
   private checkNormalLogin = () => {
@@ -98,7 +99,7 @@ export class Login extends React.PureComponent<
   }
 
   private doLogin = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e&&e.preventDefault()
     const { onLogin, history } = this.props
     const { username, password } = this.state
 

@@ -141,7 +141,7 @@ export class VizList extends React.Component<
             <Col span={24}>
               <Breadcrumb className={utilStyles.breadcrumb}>
                 <Breadcrumb.Item>
-                  <Link to="">Viz</Link>
+                  <Link to="">可视化应用</Link>
                 </Breadcrumb.Item>
               </Breadcrumb>
             </Col>
@@ -158,7 +158,7 @@ export class VizList extends React.Component<
                         this.state.collapse.dashboard ? 'down' : 'right'
                       }`}
                     />
-                    Dashboard
+                    仪表板
                   </Col>
                 </Row>
               </Box.Title>
@@ -186,7 +186,7 @@ export class VizList extends React.Component<
                     <Icon
                       type={`${this.state.collapse.display ? 'down' : 'right'}`}
                     />
-                    Display
+                    大屏
                   </Col>
                 </Row>
               </Box.Title>

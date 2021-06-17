@@ -33,6 +33,7 @@ import { makeSelectCurrentProject } from './selectors'
 import { OrganizationActions } from 'containers/Organizations/actions'
 const { loadProjectRoles, loadOrganizationMembers } = OrganizationActions
 import { IRouteParams } from 'utils/types'
+import Login from '../Login'
 
 const Project: React.FC<any> = (props) => {
   useInjectReducer({ key: 'project', reducer })
@@ -48,6 +49,7 @@ const Project: React.FC<any> = (props) => {
   // centralized handle for :projectId changing in router params
   // and update currentProject in redux
   useEffect(() => {
+    
     const match = matchPath<IRouteParams>(pathname, {
       path: '/project/:projectId',
       exact: false,

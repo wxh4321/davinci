@@ -173,7 +173,7 @@ export class DisplayList extends React.PureComponent<IDisplayListProps, IDisplay
           <div className={styles.container} onClick={this.showDisplayFormModal('add')}>
             <div className={styles.central}>
               <div className={`${styles.item} ${styles.icon}`}><Icon type="plus-circle-o" /></div>
-              <div className={`${styles.item} ${styles.text}`}>创建新 Display</div>
+              <div className={`${styles.item} ${styles.text}`}>创建新大屏</div>
             </div>
           </div>
         </div>
